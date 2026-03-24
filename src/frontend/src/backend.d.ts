@@ -120,6 +120,7 @@ export interface backendInterface {
     isCallerAdmin(): Promise<boolean>;
     isStripeConfigured(): Promise<boolean>;
     setStripeConfiguration(config: StripeConfiguration): Promise<void>;
+    setStripeConfigurationWithPassword(password: string, config: StripeConfiguration): Promise<boolean>;
     submitLead(lead: Lead): Promise<void>;
     submitOrder(order: Order): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;

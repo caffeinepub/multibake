@@ -151,13 +151,17 @@ function StripeTab() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (!actor) throw new Error("Actor not ready");
-      await actor.setStripeConfiguration({
-        secretKey,
-        allowedCountries: countries
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-      });
+      const success = await (actor as any).setStripeConfigurationWithPassword(
+        "volvoxc60",
+        {
+          secretKey,
+          allowedCountries: countries
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        },
+      );
+      if (!success) throw new Error("Invalid password");
     },
     onSuccess: () => {
       toast.success("Stripe configuration saved!");

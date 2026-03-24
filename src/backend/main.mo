@@ -2,6 +2,7 @@ import Stripe "stripe/stripe";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import OutCall "http-outcalls/outcall";
+import EmailClient "email/emailClient";
 import Map "mo:core/Map";
 import Iter "mo:core/Iter";
 import Array "mo:core/Array";
@@ -15,6 +16,9 @@ actor {
   // Authorization
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+
+  // Admin password for password-based actions
+  let adminPassword = "volvoxc60";
 
   // PRODUCT CATALOG
 
@@ -94,6 +98,40 @@ actor {
   public shared ({ caller }) func submitLead(lead : Lead) : async () {
     leads.add(nextLeadId, lead);
     nextLeadId += 1;
+
+    // Send email notification to info@multibake.ca
+    let companyLine = if (lead.company == "") { "" } else { "<tr><td style='padding:4px 0;color:#666;font-size:14px;'><strong>Company:</strong> " # lead.company # "</td></tr>" };
+    let phoneLine = if (lead.phone == "") { "" } else { "<tr><td style='padding:4px 0;color:#666;font-size:14px;'><strong>Phone:</strong> " # lead.phone # "</td></tr>" };
+
+    let htmlBody = "<div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto;'>"
+      # "<div style='background:#1a1a1a;padding:24px;text-align:center;'>"
+      # "<h1 style='color:#fff;font-size:22px;margin:0;'>New Lead - MultiBake</h1>"
+      # "</div>"
+      # "<div style='padding:24px;background:#f9f9f9;'>"
+      # "<p style='color:#333;font-size:15px;'>A new contact form submission has been received:</p>"
+      # "<table style='width:100%;border-collapse:collapse;'>"
+      # "<tr><td style='padding:4px 0;color:#666;font-size:14px;'><strong>Name:</strong> " # lead.name # "</td></tr>"
+      # "<tr><td style='padding:4px 0;color:#666;font-size:14px;'><strong>Email:</strong> " # lead.email # "</td></tr>"
+      # companyLine
+      # phoneLine
+      # "<tr><td style='padding:4px 0;color:#666;font-size:14px;'><strong>Language:</strong> " # lead.language # "</td></tr>"
+      # "</table>"
+      # "<div style='margin-top:16px;padding:16px;background:#fff;border-left:4px solid #c0392b;'>"
+      # "<strong style='color:#333;font-size:14px;'>Message:</strong>"
+      # "<p style='color:#555;font-size:14px;margin:8px 0 0;'>" # lead.message # "</p>"
+      # "</div>"
+      # "</div>"
+      # "<div style='background:#1a1a1a;padding:16px;text-align:center;'>"
+      # "<p style='color:#999;font-size:12px;margin:0;'>This notification was sent automatically by your MultiBake website.</p>"
+      # "</div>"
+      # "</div>";
+
+    ignore await EmailClient.sendServiceEmail(
+      "noreply",
+      ["info@multibake.ca"],
+      "New Lead: " # lead.name # " (" # lead.email # ")",
+      htmlBody,
+    );
   };
 
   public query ({ caller }) func getLeads() : async [Lead] {
@@ -227,6 +265,15 @@ actor {
       Runtime.trap("Unauthorized: Only admins can perform this action");
     };
     configuration := ?config;
+  };
+
+  // Password-based Stripe configuration for admin dashboard
+  public shared func setStripeConfigurationWithPassword(password : Text, config : Stripe.StripeConfiguration) : async Bool {
+    if (password != adminPassword) {
+      return false;
+    };
+    configuration := ?config;
+    return true;
   };
 
   public shared ({ caller }) func createCheckoutSession(items : [Stripe.ShoppingItem], successUrl : Text, cancelUrl : Text) : async Text {
