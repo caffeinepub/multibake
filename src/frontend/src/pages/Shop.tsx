@@ -122,26 +122,66 @@ export default function Shop() {
                 className="border border-gray-200 group"
                 data-ocid={`shop.item.${i + 1}`}
               >
-                {/* Placeholder Image */}
-                <div className="w-full h-52 bg-gray-100 flex flex-col items-center justify-center border-b border-gray-200">
-                  <svg
-                    aria-label="Product image placeholder"
-                    role="img"
-                    className="w-10 h-10 text-gray-300 mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5M3.75 3h16.5A1.5 1.5 0 0 1 21.75 4.5v15A1.5 1.5 0 0 1 20.25 21H3.75A1.5 1.5 0 0 1 2.25 19.5V4.5A1.5 1.5 0 0 1 3.75 3Z"
+                {/* Product Image */}
+                <div className="w-full h-52 bg-gray-100 flex flex-col items-center justify-center border-b border-gray-200 overflow-hidden">
+                  {p.id === "parchment-paper" ? (
+                    <img
+                      src="/assets/uploads/chatgpt_image_mar_24_2026_at_05_13_12_pm-019d21bc-0369-73c8-a718-9380c3837adf-1.png"
+                      alt="Parchment Paper (Baking Paper)"
+                      className="w-full h-full object-cover"
                     />
-                  </svg>
-                  <span className="text-xs text-gray-400 font-body tracking-wide">
-                    Image coming soon
-                  </span>
+                  ) : p.id === "greaseproof-paper" ? (
+                    <img
+                      src="/assets/uploads/chatgpt_image_mar_24_2026_at_05_14_30_pm-019d21c0-5567-743f-a202-3f364f6c8905-1.png"
+                      alt="Greaseproof Paper (PFOS & PFOA FREE)"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : p.id === "wax-paper" ? (
+                    <img
+                      src="/assets/uploads/chatgpt_image_mar_24_2026_at_05_15_29_pm-019d21c5-ad9e-73ef-b3a4-daceed0da3f3-1.png"
+                      alt="Wax Paper"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : p.id === "butcher-paper" ? (
+                    <img
+                      src="/assets/uploads/chatgpt_image_mar_24_2026_at_05_37_36_pm-019d21cd-87a5-762d-9b0c-d3138d57ce6a-1.png"
+                      alt="Butcher Paper"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : p.id === "freezer-paper" ? (
+                    <img
+                      src="/assets/uploads/chatgpt_image_mar_24_2026_at_05_38_39_pm-019d21d1-4b8c-731e-8150-8bd69a2fb232-1.png"
+                      alt="Freezer Paper"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : p.id === "bacon-paper" ? (
+                    <img
+                      src="/assets/uploads/chatgpt_image_mar_24_2026_at_05_42_37_pm-019d21d4-fe9e-7317-9509-83c17b54fc31-1.png"
+                      alt="Bacon Paper"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <>
+                      <svg
+                        aria-label="Product image placeholder"
+                        role="img"
+                        className="w-10 h-10 text-gray-300 mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5M3.75 3h16.5A1.5 1.5 0 0 1 21.75 4.5v15A1.5 1.5 0 0 1 20.25 21H3.75A1.5 1.5 0 0 1 2.25 19.5V4.5A1.5 1.5 0 0 1 3.75 3Z"
+                        />
+                      </svg>
+                      <span className="text-xs text-gray-400 font-body tracking-wide">
+                        Image coming soon
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <div className="p-5">
