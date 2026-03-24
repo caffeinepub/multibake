@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useActor } from "../hooks/useActor";
 import {
   useCreateCheckoutSession,
   useProductCatalog,
@@ -91,6 +92,7 @@ export default function Shop() {
     totalCents,
   } = useCart();
   const createCheckout = useCreateCheckoutSession();
+  const { actor } = useActor();
   const navigate = useNavigate();
   const [checkingOut, setCheckingOut] = useState(false);
 
@@ -125,10 +127,35 @@ export default function Shop() {
 
   const handleCheckout = async () => {
     if (cartItems.length === 0) return;
+    if (!actor) {
+      toast.error(
+        lang === "fr"
+          ? "Connexion non \u00e9tablie. Veuillez actualiser la page."
+          : "Connection not ready. Please refresh the page.",
+        { duration: 6000 },
+      );
+      return;
+    }
+
     setCheckingOut(true);
     try {
+      // Pre-check: verify Stripe is configured before attempting checkout
+      const stripeReady = await actor.isStripeConfigured();
+      if (!stripeReady) {
+        toast.error(
+          lang === "fr"
+            ? "Le paiement en ligne n'est pas encore activ\u00e9. Contactez-nous \u00e0 info@multibake.ca pour passer votre commande."
+            : "Online payment is not yet active. Please contact us at info@multibake.ca to place your order.",
+          { duration: 8000 },
+        );
+        setCheckingOut(false);
+        return;
+      }
+
       const origin = window.location.origin;
-      const url = await createCheckout.mutateAsync({
+
+      // Race checkout against a 30-second timeout to prevent infinite loading
+      const checkoutPromise = createCheckout.mutateAsync({
         items: cartItems.map((item) => ({
           productName: item.name,
           currency: "cad",
@@ -140,6 +167,12 @@ export default function Shop() {
         cancelUrl: `${origin}/checkout/cancel`,
       });
 
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("timeout")), 30000),
+      );
+
+      const url = await Promise.race([checkoutPromise, timeoutPromise]);
+
       if (!url || !url.startsWith("http")) {
         throw new Error("Invalid checkout URL returned");
       }
@@ -148,24 +181,33 @@ export default function Shop() {
       window.location.href = url;
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
+      const isTimeout = message.toLowerCase().includes("timeout");
       const isNotConfigured =
         message.toLowerCase().includes("not configured") ||
         message.toLowerCase().includes("stripe") ||
         message.toLowerCase().includes("key") ||
         message.toLowerCase().includes("invalid checkout url");
 
-      if (isNotConfigured) {
+      if (isTimeout) {
         toast.error(
           lang === "fr"
-            ? "Le paiement en ligne n'est pas encore activ\u00e9. Contactez-nous pour passer votre commande."
-            : "Online payment is not yet active. Please contact us to place your order.",
+            ? "La connexion au paiement a expir\u00e9. Veuillez r\u00e9essayer."
+            : "Payment connection timed out. Please try again.",
           { duration: 6000 },
+        );
+      } else if (isNotConfigured) {
+        toast.error(
+          lang === "fr"
+            ? "Le paiement en ligne n'est pas encore activ\u00e9. Contactez-nous \u00e0 info@multibake.ca pour passer votre commande."
+            : "Online payment is not yet active. Please contact us at info@multibake.ca to place your order.",
+          { duration: 8000 },
         );
       } else {
         toast.error(
           lang === "fr"
             ? "Erreur lors du paiement. Veuillez r\u00e9essayer."
             : "Checkout failed. Please try again.",
+          { duration: 5000 },
         );
       }
       setCheckingOut(false);
@@ -359,7 +401,11 @@ export default function Shop() {
                       {checkingOut ? (
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
                       ) : null}
-                      {t("shop_checkout")}
+                      {checkingOut
+                        ? lang === "fr"
+                          ? "Traitement..."
+                          : "Processing..."
+                        : t("shop_checkout")}
                     </Button>
                   </div>
                 )}

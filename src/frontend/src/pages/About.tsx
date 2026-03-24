@@ -56,8 +56,8 @@ export default function About() {
         >
           <div className="border-4 border-brand-red overflow-hidden">
             <img
-              src="/assets/uploads/image-1.png"
-              alt="MultiBake Product"
+              src="/assets/generated/multibake-parchment-product.dim_800x600.jpg"
+              alt="MultiBake Parchment Paper Product"
               className="w-full h-auto object-cover"
             />
           </div>
