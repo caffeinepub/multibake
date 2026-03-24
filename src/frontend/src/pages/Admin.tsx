@@ -138,6 +138,7 @@ function StripeTab() {
   const queryClient = useQueryClient();
   const [secretKey, setSecretKey] = useState("");
   const [countries, setCountries] = useState("CA,US");
+  const [saveError, setSaveError] = useState("");
 
   const { data: isConfigured, isLoading: checkingStatus } = useQuery({
     queryKey: ["stripeConfigured"],
@@ -150,8 +151,9 @@ function StripeTab() {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
+      setSaveError("");
       if (!actor) throw new Error("Actor not ready");
-      const success = await (actor as any).setStripeConfigurationWithPassword(
+      const success = await actor.setStripeConfigurationWithPassword(
         "volvoxc60",
         {
           secretKey,
@@ -164,12 +166,15 @@ function StripeTab() {
       if (!success) throw new Error("Invalid password");
     },
     onSuccess: () => {
+      setSaveError("");
       toast.success("Stripe configuration saved!");
       queryClient.invalidateQueries({ queryKey: ["stripeConfigured"] });
       setSecretKey("");
     },
-    onError: () => {
-      toast.error("Failed to save Stripe configuration.");
+    onError: (err) => {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      setSaveError(msg);
+      toast.error(`Failed to save: ${msg}`);
     },
   });
 
@@ -236,7 +241,7 @@ function StripeTab() {
         <Button
           data-ocid="stripe.save_button"
           onClick={() => saveMutation.mutate()}
-          disabled={saveMutation.isPending || !secretKey.trim()}
+          disabled={saveMutation.isPending || !secretKey.trim() || !actor}
           className="bg-red-700 hover:bg-red-600 text-white w-full"
         >
           {saveMutation.isPending ? (
@@ -247,6 +252,12 @@ function StripeTab() {
             "Save Stripe Configuration"
           )}
         </Button>
+
+        {saveError && (
+          <div className="mt-3 p-3 bg-red-950 border border-red-800 rounded text-red-300 text-sm break-all">
+            <strong>Error:</strong> {saveError}
+          </div>
+        )}
       </div>
     </div>
   );

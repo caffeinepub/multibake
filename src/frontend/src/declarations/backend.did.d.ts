@@ -110,6 +110,7 @@ export interface _SERVICE {
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'isStripeConfigured' : ActorMethod<[], boolean>,
   'setStripeConfiguration' : ActorMethod<[StripeConfiguration], undefined>,
+  'setStripeConfigurationWithPassword' : ActorMethod<[string, StripeConfiguration], boolean>,
   'submitLead' : ActorMethod<[Lead], undefined>,
   'submitOrder' : ActorMethod<[Order], undefined>,
   'transform' : ActorMethod<[TransformationInput], TransformationOutput>,

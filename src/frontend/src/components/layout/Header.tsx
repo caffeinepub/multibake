@@ -1,14 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ShoppingCart } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
-import { useCart } from "../../contexts/CartContext";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { Link, useNavigate } from "../../hooks/useRouter";
 
 export default function Header() {
   const { t, lang, setLang } = useLanguage();
-  const { totalItems } = useCart();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -56,22 +54,6 @@ export default function Header() {
             data-ocid="nav.toggle"
           >
             {lang === "en" ? "FR" : "EN"}
-          </button>
-
-          <button
-            type="button"
-            className="relative"
-            onClick={() => navigate("/shop")}
-            data-ocid="nav.link"
-          >
-            <div className="w-9 h-9 flex items-center justify-center text-gray-300 hover:text-brand-red transition-colors">
-              <ShoppingCart className="w-5 h-5" />
-            </div>
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-red text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                {totalItems}
-              </span>
-            )}
           </button>
 
           <Button

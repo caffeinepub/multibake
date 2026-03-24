@@ -122,6 +122,7 @@ export const idlService = IDL.Service({
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
   'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
+  'setStripeConfigurationWithPassword' : IDL.Func([IDL.Text, StripeConfiguration], [IDL.Bool], []),
   'submitLead' : IDL.Func([Lead], [], []),
   'submitOrder' : IDL.Func([Order], [], []),
   'transform' : IDL.Func(
@@ -251,6 +252,7 @@ export const idlFactory = ({ IDL }) => {
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
     'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
+    'setStripeConfigurationWithPassword' : IDL.Func([IDL.Text, StripeConfiguration], [IDL.Bool], []),
     'submitLead' : IDL.Func([Lead], [], []),
     'submitOrder' : IDL.Func([Order], [], []),
     'transform' : IDL.Func(

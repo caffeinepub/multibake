@@ -203,6 +203,7 @@ export interface backendInterface {
     isCallerAdmin(): Promise<boolean>;
     isStripeConfigured(): Promise<boolean>;
     setStripeConfiguration(config: StripeConfiguration): Promise<void>;
+    setStripeConfigurationWithPassword(password: string, config: StripeConfiguration): Promise<boolean>;
     submitLead(lead: Lead): Promise<void>;
     submitOrder(order: Order): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
@@ -433,6 +434,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.setStripeConfiguration(arg0);
+            return result;
+        }
+    }
+    async setStripeConfigurationWithPassword(arg0: string, arg1: StripeConfiguration): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.setStripeConfigurationWithPassword(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.setStripeConfigurationWithPassword(arg0, arg1);
             return result;
         }
     }

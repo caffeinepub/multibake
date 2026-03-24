@@ -6,8 +6,6 @@ import { Link } from "../../hooks/useRouter";
 export default function Footer() {
   const { t } = useLanguage();
   const year = new Date().getFullYear();
-  const hostname =
-    typeof window !== "undefined" ? window.location.hostname : "";
 
   return (
     <footer className="bg-brand-charcoal text-gray-400">
@@ -160,14 +158,6 @@ export default function Footer() {
         </div>
         <div className="border-t border-gray-700 mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-gray-600">
           <span>\u00a9 {year} MultiBake. All rights reserved.</span>
-          <a
-            href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(hostname)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-brand-red transition-colors"
-          >
-            {t("footer_copy")}
-          </a>
         </div>
       </div>
     </footer>

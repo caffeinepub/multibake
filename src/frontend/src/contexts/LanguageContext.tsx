@@ -52,6 +52,7 @@ const translations: Record<Language, Record<string, string>> = {
     uc_view: "VIEW ALL USE CASES",
     prod_title: "FEATURED PRODUCTS",
     prod_add: "ADD TO CART",
+    prod_contact_order: "Contact to Order",
     prod_view: "VIEW DETAILS",
     prod_sheet: "Sheets",
     prod_roll: "Roll",
@@ -80,7 +81,6 @@ const translations: Record<Language, Record<string, string>> = {
     footer_products: "Products",
     footer_support: "Support",
     footer_contact_col: "Contact Us",
-    footer_copy: "Built with love using caffeine.ai",
     about_title: "ABOUT MULTIBAKE",
     about_sub: "A Canadian company built on quality, safety, and performance.",
     about_story_title: "OUR STORY",
@@ -127,6 +127,8 @@ const translations: Record<Language, Record<string, string>> = {
     contact_rep: "Sales Representative",
     shop_title: "OUR PRODUCTS",
     shop_sub: "Professional-grade parchment paper for every application.",
+    shop_catalog_notice:
+      "Online ordering is temporarily unavailable. Please contact us for orders, pricing, and samples.",
     shop_checkout: "PROCEED TO CHECKOUT",
     shop_cart_empty: "Your cart is empty.",
     shop_total: "Total",
@@ -181,6 +183,7 @@ const translations: Record<Language, Record<string, string>> = {
     uc_view: "VOIR TOUS LES CAS D'USAGE",
     prod_title: "PRODUITS VEDETTES",
     prod_add: "AJOUTER AU PANIER",
+    prod_contact_order: "Contacter pour Commander",
     prod_view: "VOIR LES D\u00c9TAILS",
     prod_sheet: "Feuilles",
     prod_roll: "Rouleau",
@@ -211,7 +214,6 @@ const translations: Record<Language, Record<string, string>> = {
     footer_products: "Produits",
     footer_support: "Support",
     footer_contact_col: "Nous Contacter",
-    footer_copy: "Construit avec amour gr\u00e2ce \u00e0 caffeine.ai",
     about_title: "\u00c0 PROPOS DE MULTIBAKE",
     about_sub:
       "Une entreprise canadienne fond\u00e9e sur la qualit\u00e9, la s\u00e9curit\u00e9 et la performance.",
@@ -262,6 +264,8 @@ const translations: Record<Language, Record<string, string>> = {
     shop_title: "NOS PRODUITS",
     shop_sub:
       "Papier parchemin de qualit\u00e9 professionnelle pour chaque application.",
+    shop_catalog_notice:
+      "La commande en ligne est temporairement indisponible. Veuillez nous contacter pour les commandes, les prix et les \u00e9chantillons.",
     shop_checkout: "PASSER \u00c0 LA CAISSE",
     shop_cart_empty: "Votre panier est vide.",
     shop_total: "Total",

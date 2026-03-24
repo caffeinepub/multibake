@@ -1,8 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Award, ChevronRight, Flame, MapPin, Shield, Star } from "lucide-react";
+import {
+  Award,
+  ChevronRight,
+  Flame,
+  Mail,
+  MapPin,
+  Shield,
+  Star,
+} from "lucide-react";
 import { motion } from "motion/react";
-import { toast } from "sonner";
-import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useProductCatalog } from "../hooks/useQueries";
 import { Link, useNavigate } from "../hooks/useRouter";
@@ -75,7 +81,6 @@ const TESTIMONIALS = [
 export default function Home() {
   const { t, lang } = useLanguage();
   const { data: catalogData } = useProductCatalog();
-  const { addItem } = useCart();
   const navigate = useNavigate();
 
   const products: SeedProduct[] =
@@ -114,21 +119,6 @@ export default function Home() {
       num: "03",
     },
   ];
-
-  const handleAddToCart = (product: SeedProduct) => {
-    const name = lang === "fr" ? product.nameFr : product.nameEn;
-    addItem({
-      sku: product.sku,
-      name,
-      priceCents: Number(product.priceCents),
-      image: product.image,
-      unit:
-        product.category === "roll" ? t("prod_per_roll") : t("prod_per_box"),
-    });
-    toast.success(
-      lang === "fr" ? `${name} ajout\u00e9 au panier` : `${name} added to cart`,
-    );
-  };
 
   return (
     <div>
@@ -332,11 +322,12 @@ export default function Home() {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        className="flex-1 bg-brand-red hover:bg-red-800 text-white font-oswald text-[10px] font-bold tracking-widest uppercase rounded-none h-8"
-                        onClick={() => handleAddToCart(p)}
+                        className="flex-1 bg-brand-dark hover:bg-gray-800 text-white font-oswald text-[10px] font-bold tracking-widest uppercase rounded-none h-8 flex items-center gap-1"
+                        onClick={() => navigate("/contact")}
                         data-ocid={`products.button.${i + 1}`}
                       >
-                        {t("prod_add")}
+                        <Mail className="w-3 h-3" />
+                        {t("prod_contact_order")}
                       </Button>
                       <Button
                         size="sm"

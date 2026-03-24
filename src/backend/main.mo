@@ -244,8 +244,8 @@ actor {
   };
 
   // STRIPE INTEGRATION
-
-  var configuration : ?Stripe.StripeConfiguration = null;
+  // stable var so the Stripe key persists across canister upgrades/redeployments
+  stable var configuration : ?Stripe.StripeConfiguration = null;
 
   func getStripeConfiguration() : Stripe.StripeConfiguration {
     switch (configuration) {

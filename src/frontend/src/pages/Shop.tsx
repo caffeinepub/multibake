@@ -1,222 +1,95 @@
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Loader2, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { AlertCircle, Mail } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
-import { useActor } from "../hooks/useActor";
-import {
-  useCreateCheckoutSession,
-  useProductCatalog,
-} from "../hooks/useQueries";
 import { useNavigate } from "../hooks/useRouter";
 
-type SeedProduct = {
-  sku: string;
+type CatalogProduct = {
+  id: string;
   nameEn: string;
   nameFr: string;
   descriptionEn: string;
   descriptionFr: string;
-  priceCents: bigint;
-  category: string;
-  stock: bigint;
-  image: string;
+  categoryEn: string;
+  categoryFr: string;
 };
 
-const SEED_PRODUCTS: SeedProduct[] = [
+const CATALOG_PRODUCTS: CatalogProduct[] = [
   {
-    sku: "MB-SHEET-40",
-    nameEn: "Premium Baking Sheets 40 GSM",
-    nameFr: "Feuilles de Cuisson Premium 40 GSM",
+    id: "parchment-paper",
+    nameEn: "Parchment Paper (Baking Paper)",
+    nameFr: "Papier Parchemin (Papier de Cuisson)",
     descriptionEn:
-      "Professional-grade silicone-coated parchment sheets. Non-stick, heat-resistant up to 230\u00b0C.",
+      "Professional-grade silicone-coated parchment sheets. Non-stick, heat-resistant up to 230\u00b0C. Use: baking, roasting, steaming, cooking prep. Formats: sheets, rolls, round sheets. Customization available.",
     descriptionFr:
-      "Feuilles parchemin enduites de silicone de qualit\u00e9 professionnelle. Antiadh\u00e9sif.",
-    priceCents: BigInt(4500),
-    category: "sheet",
-    stock: BigInt(100),
-    image: "/assets/generated/product-sheets-40gsm.dim_600x500.jpg",
+      "Feuilles parchemin enduites de silicone de qualit\u00e9 professionnelle. Antiadh\u00e9sif, r\u00e9sistant \u00e0 la chaleur jusqu\u2019\u00e0 230\u00b0C. Usage\u00a0: cuisson, r\u00f4tissage, cuisson vapeur. Formats\u00a0: feuilles, rouleaux, feuilles rondes. Personnalisation disponible.",
+    categoryEn: "Baking Paper",
+    categoryFr: "Papier de Cuisson",
   },
   {
-    sku: "MB-ROLL-40",
-    nameEn: "Standard Baking Roll 40 GSM",
-    nameFr: "Rouleau de Cuisson Standard 40 GSM",
+    id: "greaseproof-paper",
+    nameEn: "Greaseproof Paper (PFOS & PFOA FREE)",
+    nameFr: "Papier Antigras (Sans PFOS & PFOA)",
     descriptionEn:
-      "Versatile standard roll for everyday commercial baking. Excellent non-stick performance.",
+      "Made of 100% virgin wood pulp. Grease-proof, waterproof, and breathable. Use: fried food packaging (fries, tempura, chicken nuggets). Formats: retail rolls, sheets, round sheets, paper bags. Customization available.",
     descriptionFr:
-      "Rouleau standard polyvalent pour la cuisson commerciale quotidienne.",
-    priceCents: BigInt(3800),
-    category: "roll",
-    stock: BigInt(100),
-    image: "/assets/generated/product-roll-40gsm.dim_600x500.jpg",
+      "Fabriqu\u00e9 \u00e0 partir de 100% de p\u00e2te de bois vierge. R\u00e9sistant aux graisses, imperm\u00e9able et respirant. Usage\u00a0: emballage d\u2019aliments frits. Formats\u00a0: rouleaux, feuilles, sacs en papier. Personnalisation disponible.",
+    categoryEn: "Greaseproof",
+    categoryFr: "Antigras",
   },
   {
-    sku: "MB-SHEET-60",
-    nameEn: "Heavy Duty Sheets 60 GSM",
-    nameFr: "Feuilles Robustes 60 GSM",
+    id: "wax-paper",
+    nameEn: "Wax Paper",
+    nameFr: "Papier Cir\u00e9",
     descriptionEn:
-      "Heavy duty sheets for high-volume bakeries and industrial applications.",
+      "100% virgin wood pulp, waxed on one or both sides per customer requirements. Use: fruit and vegetable packaging. Formats: retail rolls, sheets, round sheets, paper bags. Packaging per customer needs.",
     descriptionFr:
-      "Feuilles robustes pour les boulangeries \u00e0 haut volume.",
-    priceCents: BigInt(6500),
-    category: "sheet",
-    stock: BigInt(100),
-    image: "/assets/generated/product-sheets-60gsm.dim_600x500.jpg",
+      "P\u00e2te de bois vierge 100%, cirage simple ou double face selon les besoins du client. Usage\u00a0: emballage de fruits et l\u00e9gumes. Formats\u00a0: rouleaux, feuilles, sacs en papier. Conditionnement selon besoins.",
+    categoryEn: "Wax Paper",
+    categoryFr: "Papier Cir\u00e9",
   },
   {
-    sku: "MB-ROLL-90",
-    nameEn: "Industrial Roll 90 GSM",
-    nameFr: "Rouleau Industriel 90 GSM",
+    id: "butcher-paper",
+    nameEn: "Butcher Paper",
+    nameFr: "Papier Boucher",
     descriptionEn:
-      "Heaviest grade roll for industrial production lines and conveyor systems.",
+      "Base paper made from whole virgin wood pulp. Strong water resistance and high paper strength for meat and seafood. Use: meat charcoal roasting, baking, smoking. Size customization available for multiple product types.",
     descriptionFr:
-      "Rouleau de grade le plus lourd pour les lignes de production industrielles.",
-    priceCents: BigInt(8900),
-    category: "roll",
-    stock: BigInt(100),
-    image: "/assets/generated/product-roll-90gsm.dim_600x500.jpg",
+      "Papier de base en p\u00e2te de bois vierge. Grande r\u00e9sistance \u00e0 l\u2019eau et haute r\u00e9sistance m\u00e9canique pour viandes et fruits de mer. Usage\u00a0: grillade, cuisson, fumage. Personnalisation des dimensions disponible.",
+    categoryEn: "Butcher Paper",
+    categoryFr: "Papier Boucher",
+  },
+  {
+    id: "freezer-paper",
+    nameEn: "Freezer Paper",
+    nameFr: "Papier Cong\u00e9lateur",
+    descriptionEn:
+      "Made from whole virgin wood pulp. Suitable for -23\u00b0C to 80\u00b0C with waterproof and oil-proof functions. Use: meats, seafood, vegetables, fruits, pizza dough, flower dough. Formats: sheets, rolls, boxes.",
+    descriptionFr:
+      "Fabriqu\u00e9 en p\u00e2te de bois vierge. Adapt\u00e9 de -23\u00b0C \u00e0 80\u00b0C, imperm\u00e9able et r\u00e9sistant \u00e0 l\u2019huile. Usage\u00a0: viandes, fruits de mer, l\u00e9gumes, p\u00e2tes. Formats\u00a0: feuilles, rouleaux, bo\u00eetes.",
+    categoryEn: "Freezer Paper",
+    categoryFr: "Papier Cong\u00e9lateur",
+  },
+  {
+    id: "bacon-paper",
+    nameEn: "Bacon Paper",
+    nameFr: "Papier Bacon",
+    descriptionEn:
+      "Base paper made from whole virgin wood pulp. Strong water resistance, wide temperature range, and high paper strength for bacon processing. Use: bacon, ham, and similar cured meats.",
+    descriptionFr:
+      "Papier de base en p\u00e2te de bois vierge. Grande r\u00e9sistance \u00e0 l\u2019eau, large plage de temp\u00e9rature et haute r\u00e9sistance pour le traitement du bacon. Usage\u00a0: bacon, jambon et charcuteries.",
+    categoryEn: "Bacon Paper",
+    categoryFr: "Papier Bacon",
   },
 ];
 
 export default function Shop() {
   const { t, lang } = useLanguage();
-  const { data: catalogData, isLoading } = useProductCatalog();
-  const {
-    items: cartItems,
-    addItem,
-    removeItem,
-    updateQty,
-    clearCart,
-    totalCents,
-  } = useCart();
-  const createCheckout = useCreateCheckoutSession();
-  const { actor, isFetching: actorLoading } = useActor();
   const navigate = useNavigate();
-  const [checkingOut, setCheckingOut] = useState(false);
-
-  const products: SeedProduct[] =
-    catalogData && catalogData.length > 0
-      ? catalogData.map((p, i) => ({
-          sku: p.sku,
-          nameEn: p.nameEn,
-          nameFr: p.nameFr,
-          descriptionEn: SEED_PRODUCTS[i % SEED_PRODUCTS.length].descriptionEn,
-          descriptionFr: SEED_PRODUCTS[i % SEED_PRODUCTS.length].descriptionFr,
-          priceCents: p.priceCents,
-          category: String(p.category),
-          stock: p.stock,
-          image: SEED_PRODUCTS[i % SEED_PRODUCTS.length].image,
-        }))
-      : SEED_PRODUCTS;
-
-  const handleAdd = (p: SeedProduct) => {
-    const name = lang === "fr" ? p.nameFr : p.nameEn;
-    addItem({
-      sku: p.sku,
-      name,
-      priceCents: Number(p.priceCents),
-      image: p.image,
-      unit: p.category === "roll" ? t("prod_per_roll") : t("prod_per_box"),
-    });
-    toast.success(
-      lang === "fr" ? `${name} ajout\u00e9 au panier` : `${name} added to cart`,
-    );
-  };
-
-  const handleCheckout = async () => {
-    if (cartItems.length === 0) return;
-    if (!actor) {
-      console.error("Actor is null at checkout time");
-      toast.error(
-        lang === "fr"
-          ? "Connexion non \u00e9tablie. Veuillez actualiser la page."
-          : "Connection not ready. Please refresh the page.",
-        { duration: 6000 },
-      );
-      return;
-    }
-
-    setCheckingOut(true);
-    try {
-      // Pre-check: verify Stripe is configured before attempting checkout
-      const stripeReady = await actor.isStripeConfigured();
-      if (!stripeReady) {
-        toast.error(
-          lang === "fr"
-            ? "Le paiement en ligne n'est pas encore activ\u00e9. Contactez-nous \u00e0 info@multibake.ca pour passer votre commande."
-            : "Online payment is not yet active. Please contact us at info@multibake.ca to place your order.",
-          { duration: 8000 },
-        );
-        setCheckingOut(false);
-        return;
-      }
-
-      const origin = window.location.origin;
-
-      // Race checkout against a 30-second timeout to prevent infinite loading
-      const checkoutPromise = createCheckout.mutateAsync({
-        items: cartItems.map((item) => ({
-          productName: item.name,
-          currency: "cad",
-          quantity: BigInt(item.quantity),
-          priceInCents: BigInt(item.priceCents),
-          productDescription: "MultiBake Premium Parchment Paper",
-        })),
-        successUrl: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrl: `${origin}/checkout/cancel`,
-      });
-
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), 30000),
-      );
-
-      const url = await Promise.race([checkoutPromise, timeoutPromise]);
-
-      if (!url || !url.startsWith("http")) {
-        throw new Error("Invalid checkout URL returned");
-      }
-
-      clearCart();
-      window.location.href = url;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "";
-      const isTimeout = message.toLowerCase().includes("timeout");
-      const isNotConfigured =
-        message.toLowerCase().includes("not configured") ||
-        message.toLowerCase().includes("stripe") ||
-        message.toLowerCase().includes("key") ||
-        message.toLowerCase().includes("invalid checkout url");
-
-      if (isTimeout) {
-        toast.error(
-          lang === "fr"
-            ? "La connexion au paiement a expir\u00e9. Veuillez r\u00e9essayer."
-            : "Payment connection timed out. Please try again.",
-          { duration: 6000 },
-        );
-      } else if (isNotConfigured) {
-        toast.error(
-          lang === "fr"
-            ? "Le paiement en ligne n'est pas encore activ\u00e9. Contactez-nous \u00e0 info@multibake.ca pour passer votre commande."
-            : "Online payment is not yet active. Please contact us at info@multibake.ca to place your order.",
-          { duration: 8000 },
-        );
-      } else {
-        toast.error(
-          lang === "fr"
-            ? "Erreur lors du paiement. Veuillez r\u00e9essayer."
-            : "Checkout failed. Please try again.",
-          { duration: 5000 },
-        );
-      }
-      setCheckingOut(false);
-    }
-  };
 
   return (
     <div className="bg-white min-h-screen">
+      {/* Page Header */}
       <div className="bg-brand-dark py-16 px-6 text-center">
         <h1 className="font-oswald font-bold text-4xl md:text-5xl text-white mb-3">
           {t("shop_title")}
@@ -224,215 +97,81 @@ export default function Shop() {
         <div className="w-16 h-1 bg-brand-red mx-auto mb-4" />
         <p className="text-gray-400 font-body">{t("shop_sub")}</p>
       </div>
+
       <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          <div className="lg:col-span-2">
-            {isLoading ? (
-              <div
-                className="flex items-center justify-center py-20"
-                data-ocid="shop.loading_state"
+        {/* Catalog Notice Banner */}
+        <div className="mb-8 flex items-start gap-3 border border-amber-200 bg-amber-50 px-5 py-4">
+          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 font-body leading-relaxed">
+            {t("shop_catalog_notice")}
+          </p>
+        </div>
+
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {CATALOG_PRODUCTS.map((p, i) => {
+            const name = lang === "fr" ? p.nameFr : p.nameEn;
+            const desc = lang === "fr" ? p.descriptionFr : p.descriptionEn;
+            const category = lang === "fr" ? p.categoryFr : p.categoryEn;
+            return (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className="border border-gray-200 group"
+                data-ocid={`shop.item.${i + 1}`}
               >
-                <Loader2 className="w-8 h-8 animate-spin text-brand-red" />
-              </div>
-            ) : products.length === 0 ? (
-              <div
-                className="text-center py-20 text-gray-500 font-body"
-                data-ocid="shop.empty_state"
-              >
-                {t("shop_no_products")}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {products.map((p, i) => {
-                  const name = lang === "fr" ? p.nameFr : p.nameEn;
-                  const desc =
-                    lang === "fr" ? p.descriptionFr : p.descriptionEn;
-                  const price = Number(p.priceCents);
-                  const isRoll = p.category === "roll";
-                  return (
-                    <motion.div
-                      key={p.sku}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: i * 0.08 }}
-                      className="border border-gray-200 group"
-                      data-ocid={`shop.item.${i + 1}`}
-                    >
-                      <div className="overflow-hidden">
-                        <img
-                          src={p.image}
-                          alt={name}
-                          className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-                      <div className="p-5">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-oswald text-[10px] font-bold text-brand-red uppercase tracking-widest">
-                            {isRoll ? t("prod_roll") : t("prod_sheet")}
-                          </span>
-                          <span className="text-xs text-green-600 font-body font-medium">
-                            {t("prod_instock")}
-                          </span>
-                        </div>
-                        <h3 className="font-oswald font-semibold text-brand-dark text-base mb-2">
-                          {name}
-                        </h3>
-                        <p className="text-xs text-gray-500 font-body leading-relaxed mb-4">
-                          {desc}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <div className="font-oswald font-bold text-brand-red text-2xl">
-                            ${(price / 100).toFixed(2)}
-                            <span className="text-xs font-normal text-gray-400 ml-1">
-                              {isRoll ? t("prod_per_roll") : t("prod_per_box")}
-                            </span>
-                          </div>
-                          <Button
-                            size="sm"
-                            className="bg-brand-red hover:bg-red-800 text-white font-oswald text-xs font-bold tracking-widest uppercase rounded-none"
-                            onClick={() => handleAdd(p)}
-                            data-ocid={`shop.button.${i + 1}`}
-                          >
-                            {t("prod_add")}
-                          </Button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-          <div className="lg:col-span-1">
-            <div
-              className="sticky top-24 border-2 border-brand-dark"
-              data-ocid="shop.panel"
-            >
-              <div className="bg-brand-dark px-5 py-4 flex items-center gap-2">
-                <ShoppingCart className="w-5 h-5 text-brand-red" />
-                <span className="font-oswald font-bold text-white tracking-widest text-sm uppercase">
-                  {t("nav_cart")}
-                </span>
-                {cartItems.length > 0 && (
-                  <span className="ml-auto bg-brand-red text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartItems.reduce((s, item) => s + item.quantity, 0)}
-                  </span>
-                )}
-              </div>
-              <div className="p-5">
-                {cartItems.length === 0 ? (
-                  <p
-                    className="text-gray-500 text-sm font-body text-center py-8"
-                    data-ocid="shop.empty_state"
+                {/* Placeholder Image */}
+                <div className="w-full h-52 bg-gray-100 flex flex-col items-center justify-center border-b border-gray-200">
+                  <svg
+                    aria-label="Product image placeholder"
+                    role="img"
+                    className="w-10 h-10 text-gray-300 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                    viewBox="0 0 24 24"
                   >
-                    {t("shop_cart_empty")}
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5M3.75 3h16.5A1.5 1.5 0 0 1 21.75 4.5v15A1.5 1.5 0 0 1 20.25 21H3.75A1.5 1.5 0 0 1 2.25 19.5V4.5A1.5 1.5 0 0 1 3.75 3Z"
+                    />
+                  </svg>
+                  <span className="text-xs text-gray-400 font-body tracking-wide">
+                    Image coming soon
+                  </span>
+                </div>
+
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-oswald text-[10px] font-bold text-brand-red uppercase tracking-widest">
+                      {category}
+                    </span>
+                  </div>
+                  <h3 className="font-oswald font-semibold text-brand-dark text-base mb-2">
+                    {name}
+                  </h3>
+                  <p className="text-xs text-gray-500 font-body leading-relaxed mb-4">
+                    {desc}
                   </p>
-                ) : (
-                  <div className="space-y-4">
-                    {cartItems.map((item, i) => (
-                      <div
-                        key={item.sku}
-                        className="flex gap-3"
-                        data-ocid={`cart.item.${i + 1}`}
-                      >
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-14 h-14 object-cover shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-oswald text-xs font-semibold text-brand-dark leading-tight truncate">
-                            {item.name}
-                          </p>
-                          <p className="text-brand-red font-oswald font-bold text-sm mt-0.5">
-                            ${(item.priceCents / 100).toFixed(2)}
-                            {item.unit}
-                          </p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                updateQty(item.sku, item.quantity - 1)
-                              }
-                              className="w-6 h-6 border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                              data-ocid={`cart.button.${i + 1}`}
-                            >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="font-body text-sm w-6 text-center">
-                              {item.quantity}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                updateQty(item.sku, item.quantity + 1)
-                              }
-                              className="w-6 h-6 border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                              data-ocid={`cart.button.${i + 1}`}
-                            >
-                              <Plus className="w-3 h-3" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => removeItem(item.sku)}
-                              className="ml-auto text-gray-400 hover:text-brand-red"
-                              data-ocid={`cart.delete_button.${i + 1}`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    <Separator />
-                    <div className="flex items-center justify-between font-oswald font-bold text-brand-dark">
-                      <span className="uppercase tracking-widest text-sm">
-                        {t("shop_total")}
-                      </span>
-                      <span className="text-brand-red text-xl">
-                        ${(totalCents / 100).toFixed(2)}
-                      </span>
-                    </div>
+                  <div className="flex items-center justify-end">
                     <Button
-                      className="w-full bg-brand-red hover:bg-red-800 text-white font-oswald font-bold tracking-widest text-sm uppercase rounded-none"
-                      onClick={handleCheckout}
-                      disabled={checkingOut || actorLoading}
-                      data-ocid="shop.submit_button"
+                      size="sm"
+                      className="bg-brand-dark hover:bg-gray-800 text-white font-oswald text-xs font-bold tracking-widest uppercase rounded-none flex items-center gap-1.5"
+                      onClick={() => navigate("/contact")}
+                      data-ocid={`shop.button.${i + 1}`}
                     >
-                      {checkingOut ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          {lang === "fr" ? "Traitement..." : "Processing..."}
-                        </>
-                      ) : actorLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          {lang === "fr" ? "Chargement..." : "Loading..."}
-                        </>
-                      ) : (
-                        t("shop_checkout")
-                      )}
+                      <Mail className="w-3 h-3" />
+                      {t("prod_contact_order")}
                     </Button>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
-      </div>
-      <div className="fixed bottom-6 right-6 lg:hidden" data-ocid="shop.button">
-        {cartItems.length > 0 && (
-          <button
-            type="button"
-            onClick={() => navigate("/shop")}
-            className="bg-brand-red text-white font-oswald font-bold text-sm rounded-full w-14 h-14 flex items-center justify-center shadow-heavy"
-          >
-            <ShoppingCart className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-white text-brand-red text-[10px] font-bold rounded-full flex items-center justify-center">
-              {cartItems.reduce((s, item) => s + item.quantity, 0)}
-            </span>
-          </button>
-        )}
       </div>
     </div>
   );
