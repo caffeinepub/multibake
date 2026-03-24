@@ -5,6 +5,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { RouterProvider, useRouter } from "./hooks/useRouter";
 import About from "./pages/About";
+import Admin from "./pages/Admin";
 import CheckoutCancel from "./pages/CheckoutCancel";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Contact from "./pages/Contact";
@@ -14,6 +15,11 @@ import UseCases from "./pages/UseCases";
 
 function Routes() {
   const { pathname } = useRouter();
+
+  if (pathname === "/admin") {
+    return <Admin />;
+  }
+
   const renderPage = () => {
     if (pathname === "/") return <Home />;
     if (pathname === "/shop") return <Shop />;
@@ -24,7 +30,16 @@ function Routes() {
     if (pathname === "/checkout/cancel") return <CheckoutCancel />;
     return <Home />;
   };
-  return <>{renderPage()}</>;
+
+  return (
+    <div className="steel-bg min-h-screen">
+      <div className="max-w-[1400px] mx-auto bg-white shadow-heavy">
+        <Header />
+        <main>{renderPage()}</main>
+        <Footer />
+      </div>
+    </div>
+  );
 }
 
 export default function App() {
@@ -32,16 +47,8 @@ export default function App() {
     <LanguageProvider>
       <CartProvider>
         <RouterProvider>
-          <div className="steel-bg min-h-screen">
-            <div className="max-w-[1400px] mx-auto bg-white shadow-heavy">
-              <Header />
-              <main>
-                <Routes />
-              </main>
-              <Footer />
-            </div>
-          </div>
-          <Toaster />
+          <Routes />
+          <Toaster position="top-center" richColors />
         </RouterProvider>
       </CartProvider>
     </LanguageProvider>

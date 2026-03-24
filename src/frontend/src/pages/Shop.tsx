@@ -92,7 +92,7 @@ export default function Shop() {
     totalCents,
   } = useCart();
   const createCheckout = useCreateCheckoutSession();
-  const { actor } = useActor();
+  const { actor, isFetching: actorLoading } = useActor();
   const navigate = useNavigate();
   const [checkingOut, setCheckingOut] = useState(false);
 
@@ -128,6 +128,7 @@ export default function Shop() {
   const handleCheckout = async () => {
     if (cartItems.length === 0) return;
     if (!actor) {
+      console.error("Actor is null at checkout time");
       toast.error(
         lang === "fr"
           ? "Connexion non \u00e9tablie. Veuillez actualiser la page."
@@ -395,17 +396,22 @@ export default function Shop() {
                     <Button
                       className="w-full bg-brand-red hover:bg-red-800 text-white font-oswald font-bold tracking-widest text-sm uppercase rounded-none"
                       onClick={handleCheckout}
-                      disabled={checkingOut}
+                      disabled={checkingOut || actorLoading}
                       data-ocid="shop.submit_button"
                     >
                       {checkingOut ? (
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      ) : null}
-                      {checkingOut
-                        ? lang === "fr"
-                          ? "Traitement..."
-                          : "Processing..."
-                        : t("shop_checkout")}
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          {lang === "fr" ? "Traitement..." : "Processing..."}
+                        </>
+                      ) : actorLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          {lang === "fr" ? "Chargement..." : "Loading..."}
+                        </>
+                      ) : (
+                        t("shop_checkout")
+                      )}
                     </Button>
                   </div>
                 )}
