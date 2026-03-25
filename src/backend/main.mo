@@ -126,12 +126,19 @@ actor {
       # "</div>"
       # "</div>";
 
-    ignore await EmailClient.sendServiceEmail(
-      "noreply",
+    let emailResult = await EmailClient.sendServiceEmail(
+      "notifications",
       ["info@multibake.ca"],
       "New Lead: " # lead.name # " (" # lead.email # ")",
       htmlBody,
     );
+
+    switch (emailResult) {
+      case (#ok) {};
+      case (#err(errMsg)) {
+        Runtime.trap("Failed to send lead notification email: " # errMsg);
+      };
+    };
   };
 
   public query ({ caller }) func getLeads() : async [Lead] {
