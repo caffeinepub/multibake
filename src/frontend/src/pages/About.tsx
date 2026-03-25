@@ -128,7 +128,7 @@ export default function About() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="overflow-hidden">
             <img
-              src="/assets/generated/use-case-bakery.dim_800x600.jpg"
+              src="/assets/uploads/chatgpt_image_mar_24_2026_at_05_59_28_pm-019d21dc-6d27-7518-885a-29eec025f797-2.png"
               alt="Commercial Bakery"
               className="w-full h-72 object-cover hover:scale-105 transition-transform duration-500"
             />

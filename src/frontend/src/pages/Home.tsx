@@ -287,7 +287,6 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((p, i) => {
               const name = lang === "fr" ? p.nameFr : p.nameEn;
-              const price = Number(p.priceCents);
               const isRoll = p.category === "roll";
               return (
                 <motion.div
@@ -310,15 +309,9 @@ export default function Home() {
                     <div className="font-oswald text-[10px] font-semibold text-brand-red uppercase tracking-widest mb-1">
                       {isRoll ? t("prod_roll") : t("prod_sheet")}
                     </div>
-                    <h3 className="font-oswald font-semibold text-brand-dark text-sm mb-2 leading-tight">
+                    <h3 className="font-oswald font-semibold text-brand-dark text-sm mb-3 leading-tight">
                       {name}
                     </h3>
-                    <div className="font-oswald font-bold text-brand-red text-xl mb-3">
-                      ${(price / 100).toFixed(2)}
-                      <span className="text-xs font-normal text-gray-500 ml-1">
-                        {isRoll ? t("prod_per_roll") : t("prod_per_box")}
-                      </span>
-                    </div>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
