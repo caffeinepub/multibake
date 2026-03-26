@@ -1,4 +1,11 @@
-import { Award, CheckCircle, Leaf, MapPin, Thermometer } from "lucide-react";
+import {
+  Award,
+  CheckCircle,
+  Leaf,
+  MapPin,
+  ShieldCheck,
+  Thermometer,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { useLanguage } from "../contexts/LanguageContext";
 
@@ -7,6 +14,7 @@ const ABOUT_CHECKLIST = [
   "Silicone-coated both sides for maximum non-stick performance",
   "Compliant with FDA 21 CFR 176.170 and CFIA regulations",
   "Available in custom sizes for OEM and B2B orders",
+  "FDA, CFIA & Australian Standards Compliant",
 ];
 
 export default function About() {
@@ -79,9 +87,13 @@ export default function About() {
             {t("about_story2")}
           </p>
           <div className="space-y-3">
-            {ABOUT_CHECKLIST.map((item) => (
+            {ABOUT_CHECKLIST.map((item, i) => (
               <div key={item} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-brand-red mt-0.5 shrink-0" />
+                {i === ABOUT_CHECKLIST.length - 1 ? (
+                  <ShieldCheck className="w-5 h-5 text-brand-red mt-0.5 shrink-0" />
+                ) : (
+                  <CheckCircle className="w-5 h-5 text-brand-red mt-0.5 shrink-0" />
+                )}
                 <span className="text-sm text-gray-600 font-body">{item}</span>
               </div>
             ))}
